@@ -1,0 +1,121 @@
+ //Steganography
+function crop(image,width,height){
+    //crop an image to the specified width and height
+    var newImage= new SimpleImage(width,height);
+    for (var pix of image.values()){
+        if (pix.getX()<=width-1 && pix.getY()<=height-1){
+            newImage.setPixel(pix.getX(),pix.getY(),pix);
+        }
+    }
+    return newImage;
+}
+
+function pixchange(pixval,bitNo){
+    //keep the first bitNo bits of the color value pixval, remove the remaining 8-bitNo bits
+    pixval=Math.floor(pixval/Math.pow(2,8-bitNo))*Math.pow(2,8-bitNo);
+    return pixval;
+}
+
+
+function chop2hide(image, bitNo){
+    // keep the first bitNo bits of the colors of the image and return the image
+    var imageNew= new SimpleImage(image.getWidth(),image.getHeight());
+    for (var pix of image.values()){
+        var pixNew=imageNew.getPixel(pix.getX(),pix.getY());
+        pixNew.setRed(pixchange(pix.getRed(),bitNo));
+        pixNew.setBlue(pixchange(pix.getBlue(),bitNo));
+        pixNew.setGreen(pixchange(pix.getGreen(),bitNo));
+    }
+    return imageNew;
+}
+
+function shift(image,bitNo){
+    // keep the first bitNo bits of the colors of the image, remove the rest and shift the first bitNo bits to the end of the byte 
+    var imageNew=new SimpleImage(image.getWidth(), image.getHeight());
+    for (var pix of image.values()){
+        var pixNew=imageNew.getPixel(pix.getX(),pix.getY());
+        pixNew.setRed(Math.floor(pix.getRed()/Math.pow(2,8-bitNo)));
+        pixNew.setGreen(Math.floor(pix.getGreen()/Math.pow(2,8-bitNo)));
+        pixNew.setBlue(Math.floor(pix.getBlue()/Math.pow(2,8-bitNo)));
+    }
+    return imageNew;
+}
+
+function newpv(p,q){
+    // add numbers p and q and return an error message if their value exceeds 255
+    if (p+q>255) print('color RGB value cannot be greater than 255!!');
+    return p+q;
+}
+
+function combine(image1,image2){
+    //combine images image1 and image2 by adding their color coordinates
+    var imageCombine=new SimpleImage(image1.getWidth(),image1.getHeight());
+    for (var pix1 of image1.values()){
+        var pix2=image2.getPixel(pix1.getX(),pix1.getY());
+        var pixComb=imageCombine.getPixel(pix1.getX(),pix1.getY());
+        pixComb.setRed(newpv(pix1.getRed(),pix2.getRed()));
+        pixComb.setGreen(newpv(pix1.getGreen(),pix2.getGreen()));
+        pixComb.setBlue(newpv(pix1.getBlue(),pix2.getBlue()));
+    }
+    return imageCombine;
+}
+
+function pixRestore(pixval,bitNo){
+    //extract the last bitNo bits of a value and restore them to the first bitNo places of the byte 
+    pixRest=pixval-Math.floor(pixval/Math.pow(2,bitNo))*Math.pow(2,bitNo);
+    pixRest=pixRest*Math.pow(2,8-bitNo);
+    return pixRest;
+}
+
+function extract(image,bitNo){
+    //extract the image hidden in the last bitNo bits of the input image
+    imgExtr=new SimpleImage(image.getWidth(),image.getHeight());
+    for (var pix of image.values()){
+        var pixExtr=imgExtr.getPixel(pix.getX(),pix.getY());
+        var red=pix.getRed();var green=pix.getGreen();var blue=pix.getBlue();
+        pixExtr.setRed(pixRestore(red,bitNo));
+        pixExtr.setGreen(pixRestore(green,bitNo));
+        pixExtr.setBlue(pixRestore(blue,bitNo));
+    }
+    return imgExtr;
+}
+
+//Load the images
+var image1= new SimpleImage("kazantzakis.jpg");
+var image2=new SimpleImage("quote.jpg");
+//--------------------------------------------------------------------------------
+//Crop the images so that they are the same size
+var widthCrop=Math.min(image1.getWidth(),image2.getWidth());
+var heightCrop=Math.min(image1.getHeight(), image2.getHeight());
+var image1=crop(image1,widthCrop,heightCrop);
+var image2=crop(image2, widthCrop, heightCrop);
+
+print(image1);
+print(image2);
+
+print("image 1 width:",image1.getWidth(), "height:", image1.getHeight());
+print("image 2 width:",image2.getWidth(), "height:", image2.getHeight());
+
+//--------------------------------------------------------------------------------
+//Hide image2 inside image1
+noBits=2;//the number of bits in which we want to hide the second image
+var start=chop2hide(image1,8-noBits);//remove the last 2bits of image1
+var middle=shift(image2,noBits);//remove the last 6 bits of image 2
+var end=combine(start,middle);//combine the two images
+print(end);
+//Check the results
+print("Original Image 1:",image1.getPixel(100,100));
+print("Original Image 2:",image2.getPixel(100,100));
+print("Image 1 tweaked:",start.getPixel(100,100));
+print("Image 2 tweaked:", middle.getPixel(100,100));
+print("Final Image:",end.getPixel(100,100));
+
+//-------------------------------------------------------
+//Extract the hidden image
+imgExtract=extract(end,2);
+print(imgExtract);
+print("Extracted Image:",imgExtract.getPixel(100,100));//check the result
+//-------------------------------------------------------
+var test=new SimpleImage("test (2).png");
+print(test);
+print(extract(test,2))

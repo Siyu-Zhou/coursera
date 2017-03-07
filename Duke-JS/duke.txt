@@ -1,0 +1,389 @@
+var image=new SimpleImage("");
+for(var pixel of image.values()){
+   if(pixel.getBlue()==255){
+      pixel.setRed(0);
+      pixel.setGreen(255);
+      pixel.setBlue(100);
+   }
+}
+print(image);
+
+第3周第3节
+var image=new SimpleImage(200,200);
+for(var pixel of image.values()){
+      pixel.setRed(255);
+      pixel.setGreen(0);
+      pixel.setBlue(0);
+       if(pixel.getX()<pixel.getY()&&pixel.getY()<200-pixel.getX()&&pixel.getX()<20){
+       pixel.setRed(0);
+       pixel.setGreen(0);
+       pixel.setBlue(0);
+       
+   }
+}
+print(image);
+
+第3周第4节
+var image=new SimpleImage(200,200);
+for(var pixel of image.values()){
+    if(pixel.getY()>120){
+       pixel.setRed(0);
+       pixel.setGreen(0);
+       pixel.setBlue(255);
+    }
+    else{
+        if(pixel.getY()>60&&pixel.getX()>60){
+	   pixel.setRed(0);
+           pixel.setGreen(255);
+           pixel.setBlue(0);
+	}
+	else
+	{
+	   pixel.setRed(255);
+           pixel.setGreen(0);
+           pixel.setBlue(0);
+	}
+    }
+}
+print(image);
+
+第6节
+//start with the foreground image you want(fgImage)
+var fgImage=new SimpleImage("drewRobert.png");
+//...and with the background imge you want(bgImage)
+var bgImage=new SimpleImage("dinos.png");
+//Make a blank image of th same size(output)
+var output=new SimpleImage(fgImage.getWidth(),fg.Image.getHeight());
+for(var pixel of fgImage.values()){
+    //Look at currentPixel and if it is green
+    if(pixel.getGreen()==255){
+       //Look at same position in bgImage
+       var x=pixel.getX();
+       var y=pixel.getY();
+       var bgpixel=bgImage.getPixel(x,y);
+       //and set output's corresponding pixel to bgImage's pixel
+       output.setPixel(x,y,bgPixel);
+    }
+    //Otherwise:set output's corresponding pixel to currentPixel
+    else{
+        output.setPixel(pixel.getX(),pixel.getY(),pixel);
+    }
+}
+
+第四周第一节
+function setBorderColor(pixel){
+     pixel.setRed(0);
+     pixel.setGreen(0);
+     pixel.setBlue(0);
+     return pixel;
+}
+var image=new SimpleImage("lion.jpg");
+for(var pixel of image.values()){
+   var x=pixel.getX();
+   var y=pixel.getY();
+   if(x<10||y<10||x>=image.getWidth()-10||y>=image.getHeight()-10){
+      pixel=setBorderColor(pixel);
+   }
+}
+print(image);
+
+function setBlack(pixel){
+    pixel.setRed(0);
+    pixel.setGreen(0);
+    pixel.setBlue(0);
+    return pixel;
+}
+function pixelOnEdge(pixel,image){
+   var x=pixel.getX();
+   var y=pixel.getY();
+   if(x<10) return true;
+   if(y<10) return true;
+   if(x>=image.getWidth()-10) return true;
+   if(y>=image.getHeight()-10) return true;
+   return false;
+}
+var image=new SimpleImage("lion.jpg");
+for(var pixel of image.values()){
+    if(pixelOnEdge(pixel,image)){
+       pixel=setBlack(pixel);
+    }
+}
+print(image);
+
+EX1
+function swapRedGreen(pixel){
+    var x=pixel.getRed();
+    var y=pixel.getGreen();
+     pixel.setRed(y);
+     pixel.setGreen(x);
+     return pixel;
+}
+
+var image=new SimpleImage("smallhands.png");
+for(var pixel of image.values()){
+    pixel=swapRedGreen(pixel);
+}
+print(image);
+
+EX2
+function moreRed(pixel,y){
+    var x=pixel.getRed();
+    pixel.setRed(x+y);
+    return pixel;
+}
+var image=new SimpleImage("eastereggs.jpg");
+var y;
+for(var pixel of image.values()){
+    pixel=moreRed(pixel,50);
+}
+print(image);
+
+EX3
+function setBlack(pixel){
+    pixel.setRed(0);
+    pixel.setGreen(0);
+    pixel.setBlue(0);
+    return pixel;
+}
+
+function pixelOnEdge(pixel,image,Verticalborder,Horizonborder){
+    var x=pixel.getX();
+    var y=pixel.getY();
+    if(x<Horizonborder) return true;
+    if(y<Verticalborder) return true;
+    if(x>=image.getWidth()-Horizonborder) return true;
+    if(y>=image.getHeight()-Verticalborder) return true;
+    return false;
+}
+
+
+var image=new SimpleImage("eastereggs.jpg");
+var Verticalborder=10,Horizonborder=20;
+for(var pixel of image.values()){
+    if(pixelOnEdge(pixel,image,Verticalborder,Horizonborder)){
+       pixel=setBlack(pixel);
+    }
+}
+print(image);
+
+第四周第2节
+//steganography
+function clearbits(colorval){
+   //compute the same color value with the low bits zeroed
+   var x=Math.floor(colorval/16)*16;
+   return x;
+}
+function chop2hide(image){
+  //for each pixel in the image
+  for(var px of image.values()){
+  //clear the low bits of the red
+  px.setRed(clearbits(px.getRed()));
+  //clear the low bits of the green
+  px.setGreen(clearbits(px.getGreen()));
+  //clear the low bits of the blue
+  px.setBlue(clearbits(px.getBlue()));
+  }
+  //after doing each pixel return the image as the answer
+  return image;
+}
+function shift(image){
+  //for each pixel in the image
+   for(var px of image.values()){
+  //shift the red bits over
+    px.setRed(px.getRed()/16);
+  //shift the green bits over
+    px.setGreen(px.getGreen()/16);
+  //shift the blue bits over
+    px.setBlue(px.getBlue()/16);
+  }
+  //after doing each pixel return the image as the answer
+  return image;
+}
+function combine(show,hide){
+  //make a new image the same size as "show"(call it answer)
+   var answer=new SimpleImage(show.getWidth(),show.getHeight());
+  //for each pixel in answer 
+   for(var px of answer.values()){
+  //get the x and y of that pixel
+    var x=px.getX();
+    var y=px.getY();
+  //get  the pixel in the same place from show
+    var showPixel=show.getPixel(x,y);
+  //get the pixel in the same place from hide
+    var hidePixel=hide.getPixel(x,y);
+  //set the red of px to the same of showPixel's red+hidePixel's red
+    px.setRed(showPixel.getRed()+hidePixel.getRed());
+  //set the green of px to the same of showPixel's green+hidePixel's green
+    px.setGreen(showPixel.getGreen()+hidePixel.getGreen());
+  //set the blue of px to the same of showPixel's blue+hidePixel's blue
+    px.setBlue(showPixel.getBlue()+hidePixel.getBlue());
+   
+   }
+  //after doing each pixel, return ans answer of the image we called "answer"
+  return answer;
+}
+
+var start=new SimpleImage("usain.jpg");
+var hide=new SimpleImage("skyline.jpg");
+
+start=chop2hide(start);
+hide=shift(hide);
+var ans=combine(start,hide);
+print(ans);
+
+
+function crop(image,width,height){
+   for(var pixel of image.values()){
+      if(pixel.getX()>width||pixel.getY()>height){
+         pixel.setRed(255);
+	     pixel.setGreen(255);
+	     pixel.setBlue(255);
+      }
+   } 
+   return image;
+}
+var image=new SimpleImage("astrachan.jpg");
+var width=200;
+var height=300;
+var ans=crop(image,width,height);
+print(ans);
+
+第四周第3节
+//I started with the image I want(inImage)
+var inImage=new SimpleImage("Chapel.png");
+//I made a blank image(outImage),twic as wide+tall
+var outImage=new SipmleImage(inImage.getWidth()*2,inImage.getHeight()*2);
+//for each pixel in outImage
+for(var pixel of outimage.values()){
+//computed x=floor(pixel's x/2)
+   var x=Math.floor(pixel.getX()/2);
+//computed y=floor(pixel's y/2)
+   var y=Math.floor(pixel.getY()/2);
+//set to the same color as the pixel at(x,y) inImage
+   var inPixel=inImage.getPixel(x,y);
+   pixel.setRed(inPixel.getRed());
+   pixel.setGreen(inPixel.getGreen());
+   pixel.setBlue(inPixel.getBlue());
+}
+//print our result (outImage)
+print(outImage);
+
+第四周第四节
+function extract(image){
+   for(var pixel of image.values()){
+      px.setRed((px.getRed()%16)*16);
+      px.setGreen((px.getGreen()%16)*16);
+      px.setBlue((px.getBlue()%16)*16);
+   }
+   return image;
+}
+ var image=new SimpleImage();
+ image=extract(image);
+ print(image);
+
+
+ function enlarge(inimage,outimage){
+    for(var pixel of outimage.values()){
+        var x=pixel.getX();
+	var y=pixel.getY();
+	if(x<inimage.getWidth()&&y<inimage.getHeight()){
+	var inpixel=inimage.getPixel(x,y) ;
+	pixel.setRed(inpixel.getRed());
+	pixel.setGreen(inpixel.getGreen()); 
+	pixel.setBlue(inpixel.getBlue()); 
+	}
+	if(x>inimage.getWidth()&&y<inimage.getHeight()){
+	var inpixel=inimage.getPixel((x-inimage.getWidth()),y) ;
+	pixel.setRed(inpixel.getRed());
+	pixel.setGreen(inpixel.getGreen()); 
+	pixel.setBlue(inpixel.getBlue()); 
+	}
+	if(y>inimage.getHeight()&&x<inimage.getWidth()){
+	var inpixel=inimage.getPixel(x,(y-inimage.getHeight())) ;
+	pixel.setRed(inpixel.getRed());
+	pixel.setGreen(inpixel.getGreen()); 
+	pixel.setBlue(inpixel.getBlue()); 
+	}
+	if(y>inimage.getHeight()&&x>inimage.getWidth()){
+	var inpixel=inimage.getPixel((x-inimage.getWidth()),(y-inimage.getHeight())) ;
+	pixel.setRed(inpixel.getRed());
+	pixel.setGreen(inpixel.getGreen()); 
+	pixel.setBlue(inpixel.getBlue()); 
+	}
+	 
+    }
+    return outimage;
+ }
+ var inImage=new SimpleImage("rodger.png");
+ var outImage=new SimpleImage(inImage.getWidth()*2,inImage.getHeight()*2);
+ outImage=enlarge(inImage,outImage);
+print(outImage);
+
+第五节
+function dist(pixel,x,y){
+   var dx=pixel.getX()-x;
+   var dy=pixel.getY()-y;
+   return Math.sqrt(dx*dx+dy*dy);
+}
+//start with a blank image
+var output=new SimpleImage(320,320);
+
+//Make something here
+for(var pixel of output.values()){
+   if(dist(pixel,100,100)<50){
+      pixel.setRed(255-4*dist(pixel,100,100));
+   }
+   else if(dist(pixel,200,200)<80){
+      pixel.setGreen(255-3*dist(pixel,200,200));
+   }
+   else if(Math.random()>0.995){
+      pixel.setRed(255);
+      pixel.setGreen(255);
+   }
+   //pixel.setBlue(1.5*pixel.getY()-pixel.getX());
+   //pixel.setBlue(pixel.getX()-1.5*pixel.getY());
+   pixel.setBlue(Math.max(1.5*pixel.getY()-pixel.getX(),pixel.getX()-1.5*pixel.getY()));
+
+}
+
+
+//print whatever you made
+print(output);
+
+function ensureInImage(coordinate,size){
+    //coordinate cannot be negative
+    if(coordinate<0){
+    return 0;
+    }
+    //coordinate must be in range[0...size-1]
+    if(coordinate>=size){
+    return size-1;
+    }
+    return coordiante;
+}
+
+
+function getPixelNearby(image,x,y,diameter){
+    var dx=Math.random()*diameter-diameter/2;
+    var dy=Math.random()*diameter-diameter/2;
+    var nx=ensureInImage(x+dx,image.getWidth());
+    var ny=ensureInImage(y+dy,image.getHeight());
+    return image.getPixel(nx,ny);
+}
+
+var image=new SimpleImage("duvall.jpg");
+var output=new SimpleImage(image.getWidth(),image.getHeight());
+
+for(var pixel of image.values()){
+    var x=pixel.getX();
+    var y=pixel.getY();
+    if(Mah.random()>0.5){
+       var other=getPixelNearby(image,x,y,10);
+       output.setPixel(x,y,other);
+    }
+    else{
+       output.setPixel(x,y,pixel);
+    }
+ 
+}
+

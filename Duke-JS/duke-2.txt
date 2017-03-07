@@ -1,0 +1,178 @@
+function crop(image,width,height){
+   for(var pixel of image.values()){
+      if(pixel.getX()>width||pixel.getY()>height){
+         pixel.setRed(255);
+	     pixel.setGreen(255);
+	     pixel.setBlue(255);
+      }
+   } 
+   return image;
+}
+var image=new SimpleImage("astrachan.jpg");
+var width=200;
+var height=300;
+var ans=crop(image,width,height);
+print(ans);
+
+
+function clearbits(colorval){
+    var x=Math.floor(colorval/16)*16;
+    return x;
+}
+function chop2Hide(image){
+    for(var pixel of image.values()){
+        pixel.setRed(clearbits(pixel.getRed()));
+	pixel.setBlue(clearbits(pixel.getBlue()));
+	pixel.setGreen(clearbits(pixel.getGreen()));
+    }
+    return image;
+}
+
+function printtest(image){
+    for(var pixel of image.values()){
+    if(pixel.getX()==50&&pixel.getY()==60){
+        print(pixel.getRed());
+	print(pixel.getGreen());
+	print(pixel.getBlue());
+     }
+ }
+}
+
+function shift(image){
+    for(var pi of image.values()){
+       pi.setRed(pi.getRed()/16);
+       pi.setBlue(pi.getBlue()/16);
+       pi.setGreen(pi.getGreen()/16);
+    }
+    return image;
+}
+
+var start=new SimpleImage();
+var hide=new SimpleImage();
+start=chop2Hide(start);
+hide=shift(hide);
+var answer=new SimpleImage(start.getWidth(),star.getHeight());
+for(var pi of answer.values()){
+   var x=pi.getX();
+   var y=pi.getY();
+   var showPixel=show.Pixel(x,y);
+   var hidePixel=hide.Pixel(x,y);
+   newpq(show.Pixel.getRed(),hide.Pixel.getRed())
+}
+newpq(p,q){
+    if(p+q>255)
+    print error message;
+    return false;
+}
+
+E-Profolio
+function crop(image,width,height){
+//create newImage to set specified width and height image
+    var newImage=new SimpleImage(width,height);
+    for(var pixel of image.values()){
+        if(pixel.getX()<=width-1&&pixel.getY()<=height-1){
+	   newImage.setPixel(pixel.getX(),pixel.getY(),pixel);
+	}   
+    }
+    return newImage;
+}
+
+//convert last numbits to 0's
+function pixchange(pixval,numbits){
+//math.pow(2,numbits)=2∧numbits
+      var x=Math.floor(pixval/Math.pow(2,8-numbits))*Math.pow(2,8-numbits);
+     return x;
+}
+
+//set each pixel which converted last numbits to 0's to image(start)) 
+function chop2hide(image,numbits){
+    for(var pix of image.values()){
+       pix.setRed(pixchange(pix.getRed(),numbits));
+       pix.setGreen(pixchange(pix.getGreen(),numbits));
+       pix.setBlue(pixchange(pix.getBlue(),numbits));
+    }
+    return image;
+}
+
+//shift top (8-numbits) bits to right,clear out top numbits
+function shift(image,numbits){
+     for(var pix of image.values()){
+        pix.setRed(Math.floor(pix.getRed()/Math.pow(2,numbits)));
+    	pix.setGreen(Math.floor(pix.getGreen()/Math.pow(2,numbits)));
+    	pix.setBlue(Math.floor(pix.getBlue()/Math.pow(2,numbits)));
+     }
+     return image;
+}
+
+//add p(start) q(hide),if their values exceeds 255 return error message
+function newpq(p,q){
+     if((p+q)>255)
+     print('color RGB value cannot be great than 255!!');
+     return p+q;
+}
+
+//add image1's and image2's color coordinates
+function combine(image1,image2){
+       var ans=new SimpleImage(image1.getWidth(),image1.getHeight());
+       for(var pix of ans.values()){
+      var x=pix.getX();
+	  var y=pix.getY();
+	  var image1Pixel=image1.getPixel(x,y);
+	  var image2Pixel=image2.getPixel(x,y);
+	  pix.setRed(newpq(image1Pixel.getRed(),image2Pixel.getRed()));
+      pix.setGreen(newpq(image1Pixel.getGreen(),image2Pixel.getGreen()));
+	  pix.setBlue(newpq(image1Pixel.getBlue(),image2Pixel.getBlue()));
+       }
+       return ans;
+}
+
+//extract the last numbits bits of a pixel and restore them to the first numbits
+function exnum(num,numbits){
+        var restore=num-Math.floor(num/Math.pow(2,numbits))*Math.pow(2,numbits);
+	    restore=restore*Math.pow(2,8-numbits);
+	return restore;    
+}
+
+//extract the image hidden in the last numbits of the input image(combine)
+function extract(stego,numbits){
+     for(var px of stego.values()){
+      px.setRed(exnum(px.getRed(),numbits));
+      px.setGreen(exnum(px.getGreen(),numbits));
+      px.setBlue(exnum(px.getBlue(),numbits));
+   }
+   return stego;
+}
+
+var start=new SimpleImage("astrachan.jpg");
+var hide=new SimpleImage("duvall.jpg");
+print(start);
+print("start width:",start.getWidth(),"height",start.getHeight());
+print(hide);
+print("hide width:",hide.getWidth(),"height",hide.getHeight());
+
+
+var cropWidth=Math.min(start.getWidth(),hide.getWidth());
+var cropHeight=Math.min(start.getHeight(),hide.getHeight());
+var start=crop(start,cropWidth,cropHeight);
+var hide=crop(hide,cropWidth,cropHeight);
+print(start);
+print("start width",start.getWidth(),"height",start.getHeight());
+print(hide);
+print("hide width:",hide.getWidth(),"height",hide.getHeight());
+
+//hide hide inside start
+numbits=2;
+var start1=chop2hide(start,8-numbits);
+var hide1=shift(hide,8-numbits);
+var comb=combine(start,hide);
+print(comb);
+print("Oringinal start",start.getPixel(100,100));
+print("Oringinal hide",hide.getPixel(100,100));
+print("Changed start",start1.getPixel(100,100));
+print("Changed hide",hide1.getPixel(100,100));
+print("Final Image",comb.getPixel(100,100));
+
+//extract hide image
+var ext=extract(comb,numbits);
+print(ext);
+print("Extract Image",ext.getPixel(100,100));
